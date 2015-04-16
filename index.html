@@ -29,6 +29,15 @@
 		<!--[if lt IE 9]>
 		<script src="lib/js/html5shiv.js"></script>
 		<![endif]-->
+
+		<!-- Custom styles -->
+		<style media="screen">
+			.no-border {border: 0!important; box-shadow: none!important;}
+			.no-background {background: transparent!important;}
+			.negligible {color: #888;}
+			small {vertical-align: baseline!important;}
+		</style>
+
 	</head>
 
 	<body>
@@ -51,10 +60,10 @@
 						<li>Server-side code</li>
 						<li>Build tasks</li>
 						<li>Sanity checks</li>
-						<li>Client-side code</li>
-						<li>i18n</li>
-						<li>Navigation tests</li>
-						<li>Git rules</li>
+						<li class="negligible">Client-side code</li>
+						<li class="negligible">i18n</li>
+						<li class="negligible">Navigation tests</li>
+						<li class="negligible">Git rules</li>
 					</ul>
 				</section>
 
@@ -62,12 +71,220 @@
 					<section>
 						<h2>NodeJS pre-requisites</h2>
 					</section>
+					<section>
+						<h3>Single-threaded...</h3>
+						<p>
+							...kind of
+						</p>
+					</section>
+					<section data-background-color="#fff">
+						<img src="images/event-loop.png" alt="" class="no-border no-background" />
+					</section>
+					<section>
+						<h3>Middleware</h3>
+					</section>
+					<section data-background-color="#fff">
+						<img src="images/middleware-mess.png" alt="" class="no-border no-background" />
+							<pre><code class="javascript">
+	function middleware_A (req, res, next){
+		// do stuff on req, res
+		next();
+	}
+
+	function middleware_B (req, res, next){
+		// do stuff on req, res
+		next();
+	}
+							</code></pre>
+					</section>
+					<section data-background-color="#fff">
+						<img src="images/middleware-use.png" alt="" class="no-border no-background" />
+						<pre><code class="javascript">
+	// declaration order is followed
+	app.use(middleware_A);
+	app.use(middleware_B);
+	app.use(middleware_C);
+	app.use(middleware_D);
+	app.use(middleware_E);
+						</code></pre>
+					</section>
+					<section>
+						<h4>Error middleware</h4>
+						<pre><code class="javascript">
+	app.use(function onerror(err, req, res, next) {
+  	// an error occurred!
+	});
+						</code></pre>
+						<p>Always the last one</p>
+					</section>
+					<section>
+						<h3>Modules</h3>
+					</section>
+					<section>
+						<ul>
+							<li>Globals</li>
+							<li>AMD</li>
+							<li>commonJS</li>
+							<li>ES6</li>
+						</ul>
+					</section>
+					<section>
+						<h4>commonJS</h4>
+
+						<pre><code class="javascript">
+	// myLib.js
+	module.exports = {
+		run : function(){ ... }
+	};
+
+						</code></pre>
+
+						<pre><code class="javascript">
+	var myLib = require('./myLib');
+
+	myLib.run();
+
+						</code></pre>
+
+						<p>node.js standard</p>
+
+					</section>
+
+					<section>
+						<h4>commonJS</h4>
+
+						<pre><code class="javascript">
+	// myLib.js
+	export default function () { ... };
+						</code></pre>
+
+						<pre><code class="javascript">
+	import myLib from 'myLib';
+						</code></pre>
+
+						<p>Used in client-side code</p>
+
+					</section>
 				</section>
 
 				<section>
 					<section>
 						<h2>General structure</h2>
 					</section>
+					<section>
+						<pre><code class="vim">
+
+	viadeo-webapp/
+		├─ app/*
+		├─ config/*
+		├─ docs/
+		├─ tasks/*
+		└─ tests/*
+						</code></pre>
+					</section>
+					<section>
+						<h3>Web application files</h3>
+						<pre><code class="vim">
+	app/
+		├─ assets/
+		├─ controllers/
+		├─ filters/
+		├─ lang/
+		├─ services/
+		└─ views/
+						</code></pre>
+					</section>
+
+					<section>
+						<h3>Runtime configuration files</h3>
+						<pre><code class="vim">
+	config/
+		├─ boot/
+		├─ convict/
+		├─ environnements/*
+		├─ initializers/*
+		├─ middleware/
+		|
+		├─ routes.js
+		|
+		├─ assets.json
+		├─ smartAds.json
+		├─ urlAliases.json
+		├─ urlCSRF.json
+		|
+		├─ (npm-shrinkwrap.json)
+		└─ (requirejs/)
+						</code></pre>
+					</section>
+
+					<section>
+						<h3>Server start scripts</h3>
+						<pre><code class="vim">
+	initializers/
+		├─ 00_loggersInit.js
+		├─ 10_config.js
+		├─ 20_i18n.js
+		├─ 30_templating.js
+		├─ 40_server.js
+		├─ 50_controller.js
+		├─ 60_urlGenerator.js
+		└─ 70_listeners.js
+						</code></pre>
+					</section>
+
+					<section>
+						<h3>Middleware sequence description</h3>
+						<pre><code class="vim">
+	environnements/
+		├─ all/
+		├─ development/
+		└─ preprod/
+						</code></pre>
+					</section>
+
+					<section>
+						<h3>Build tasks (dev &amp; prod)</h3>
+						<pre><code class="vim">
+	tasks/
+		├─ config/
+		|
+		├─ coverage/
+		├─ missing-tests.sh
+		├─ hooks/
+		|
+		├─ options/
+		├─ packaging/
+		|
+		├─ rollout/
+		├─ kasperDependenciesCheck/
+		├─ stress.sh
+		|
+		└─ translation/
+						</code></pre>
+					</section>
+
+					<section>
+						<h3>Root config files</h3>
+						<pre><code class="vim">
+
+	viadeo-webapp/
+		├─ app.js
+		|
+		├─ .bowerrc
+		├─ .jsbeautifyrc
+		├─ .jshintrc
+		├─ .node.jshintrc
+		|
+		├─ Gruntfile.js
+		|
+		├─ circle.yml
+		├─ newrelic.js
+		|
+		├─ bower.json
+		└─ package.json
+						</code></pre>
+					</section>
+
 				</section>
 
 				<section>
@@ -78,21 +295,156 @@
 							<li>Boot phase</li>
 							<li>Routing</li>
 							<li>Data aggregation</li>
+							<li>Filters</li>
 							<li>Unit tests</li>
 							<li>View rendering</li>
 						</ul>
 					</section>
+					<section data-background-color="#fff">
+						<h3>Frameworks</h3>
+						<img src="images/node-stack.png" alt="" class="no-border no-background" />
+						<ul>
+							<li>node.js : http.Server</li>
+							<li>Express : routing, middleware</li>
+							<li>Maglev : ror-like conventions, autodiscovery</li>
+						</ul>
+					</section>
+					<section>
+						<h3>Main dependencies</h3>
+						<table>
+							<tr>
+								<td>
+									viadeo modules
+								</td>
+								<td>
+									open-source
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<ul>
+										<li>platform (kasper client)</li>
+										<li>urn resolver</li>
+										<li>thumbor</li>
+										<li>url generation</li>
+										<li>memcached</li>
+										<li>logger</li>
+										<li>utils (e.g. Promises)</li>
+									</ul>
+								</td>
+								<td style="vertical-align: top;">
+									<ul>
+										<li>handlebars</li>
+										<li>i18next</li>
+										<li>express</li>
+										<li>maglev (locomotive fork)</li>
+									</ul>
+								</td>
+							</tr>
+						</table>
+					</section>
+
+					<section>
+						<h2>Boot phase</h2>
+						<ul>
+							<li>config loading</li>
+							<li>initializers</li>
+						</ul>
+					</section>
+
+					<section>
+						<h2>Routing</h2>
+						<ul>
+							<li>Maglev conventions</li>
+							<li>special middleware</li>
+						</ul>
+						<p><br /><code>config/route.js</code></p>
+					</section>
+
+					<section>
+						<h2>Data aggregation &amp; composition</h2>
+						<ul>
+							<li>controllers</li>
+							<li>services</li>
+						</ul>
+					</section>
+
+					<section>
+						<h3>Service responsibilities</h3>
+						<ul>
+							<li>aggregate data from backend</li>
+							<li>format data</li>
+							<li>resiliently handles errors</li>
+						</ul>
+					</section>
+
+					<section>
+						<h3>Controllers responsibilities</h3>
+						<ul>
+							<li>handle actions</li>
+							<li>handle authorizations</li>
+							<li>address one service per action</li>
+							<li>handles service errors</li>
+							<li>triggers rendering</li>
+						</ul>
+					</section>
+
+					<section>
+						<h2>Filters <small>&amp; base filters</small></h2>
+						<p>= middleware called on specific routes</p>
+					</section>
+
+					<section data-background-color="#fff">
+						<img src="images/request-treatment.png" alt="" class="no-border no-background" />
+					</section>
+
+					<section>
+						<h2>Unit tests</h2>
+					</section>
+
+					<section>
+						<h3>rewire</h3>
+					</section>
+
+					<section>
+						<h2>View rendering</h2>
+						<ul>
+							<li>performed by Express</li>
+						</ul>
+					</section>
+
 				</section>
 
 				<section>
 					<section>
 						<h2>Build tasks</h2>
 					</section>
+					<section>
+						<img src="images/grunt-logo.png" alt="" class="no-border no-background" />
+					</section>
+					<section>
+						<h3>Grunt</h3>
+						<ul>
+							<li>Tasks written in JS</li>
+							<li><em>de facto</em> standard 2 years ago</li>
+							<li>based on configurations</li>
+						</ul>
+						<p>sass, less, es6, jsx, client-side modules</p>
+					</section>
 				</section>
 
 				<section>
 					<section>
 						<h2>Sanity checks</h2>
+					</section>
+					<section>
+						<ul>
+							<li>jshint</li>
+							<li>js syntax style</li>
+							<li>coverage threshold</li>
+							<li>cyclomatic complexity</li>
+							<li>... they all block commit or push</li>
+						</ul>
 					</section>
 				</section>
 
@@ -150,7 +502,7 @@
 					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
 					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
 					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-					{ src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.configure({ tabReplace: '  ' }); hljs.initHighlightingOnLoad(); } },
 					{ src: 'plugin/zoom-js/zoom.js', async: true },
 					{ src: 'plugin/notes/notes.js', async: true }
 				]
